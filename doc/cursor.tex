@@ -1,0 +1,324 @@
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+
+\title{Sintaxis del DSL CURSOR}
+\author{Cristian Andrione\\
+  \small Programación Profesional\\
+  \small Analista Universitario en Sistemas\\
+  \small Instituo Politécnico "General San Martín"\\
+  \small Universidad Nacional de Rosario
+}
+
+\begin{document}
+
+\maketitle
+
+\abstract{ Se propone un {\tt DSL}, para realizar procesamiento de texto,
+al que bautizamos con el nombre {\tt Cursor}. Aprovecharemos, para este
+cometido, la potencia del editor de texto {\tt Vim}, en particular de su lenguaje
+de srcipting {\tt Vimscript},
+un lenguaje de programación con todas las de la ley: sistema de tipos, variables,
+funciones, bucles, condicionales, listas, programación funcional, expresiones
+regulares, etc.
+Este lenguaje es muy potente y provee una granularidad muy fina a la hora de
+realizar operaciones sobre textos. El precio que pagamos
+por ello es una elevada curva de apredinzaje.\\
+\indent Considerando esto último como un obstáculo para su uso y apredizaje por
+parte de quienes no son usuarios habituales de {\tt Vim}, proponemos un {\tt DSL}
+con menor potencia pero mas sencillo.
+
+\section{Dominio}
+El dominio de nuestro {\tt DSL} es el procesamiento de texto.
+Dado un texto tendremos posibilidad de indicar una serie de
+operaciones sobre él mediante la sintaxis de nuestro {\tt DSL}
+que será traducida a {\tt Vimscript} para ejecutarse sobre el
+texto a tratar.
+
+\section{DSL}
+Un ejemplo de la sintaxis:
+\\
+\begin{verbatim}
+WHILE lineaActual() < totalLineas()
+     SINCE
+        IF
+            SUBSTRING("hola", lineaActual())
+        THEN
+            REEMPLAZAR ("hola", "chau!");
+            AGREGAR(";", finLinea());
+        ELSE
+            SKIP;
+        ENDIF
+        avanzarLinea(1);
+     UNTIL
+\end{verbatim}
+\indent El indentado es solo a los efectos de hacer mas legible el programa por
+parte de las personas.
+Este programa recorre desde la primera hasta la última línea del texto,
+cuando encuentra la cadena {\tt 'hola'} la reemplaza por {\tt 'chau'} y agrega
+un punto y coma al final de la línea.
+El compilador nos dará la siguiente salida en un archivo: command.vim
+\begin{verbatim}
+while line('.') < line('$')
+    call cursor( line('.')+1, 1)
+    if stridx(getline('.'), 'hola') > -1
+        execute "%s/'hola'/'chau'"
+        execute "normal! A;\<ESC>"
+    endif
+endwhile
+\end{verbatim}
+Por último se ejecuta la secuencia de operaciones:
+\begin{verbatim}
+vim -n -N -u NONE -S comand.vim achivo_a_procesar.txt
+\end{verbatim}
+La salida es el mismo archivo. El archivo no necesariamente debe estar
+escrito con {\tt Vim}.
+
+\subsection{Directivas}
+
+Tenemos cuatro directivas:\\
+{\tt FILEIN} path del archivo a procesar.\\
+{\tt FILEOUT} path del archivo de salida, puede ser el mismo.\\
+{\tt BEGINPROG} comienzo del programa.\\
+{\tt ENDPROG} fin del programa.\\
+
+\subsection{Variables, Tipos y Asiganciones}
+La variables podrán tener los tipos {\tt INTEGER}, {\tt STRING} o {\tt
+BOOLEAN}.
+La asignación de un valor a una variables de realiza mediante el signo {\tt =},
+a la izquierda encontramos el identificador de la variable y a la
+derecha la expresión que generará el valor a asignar.
+
+En el momento de la asignación se infiere el tipo de la variable.\\
+{\tt VARIABLE = EXPRESION};
+
+\subsection{Expresiones, Operandos y Operadores}
+Las expresiones son una combinación de operandos y operadores.
+
+\subsubsection{Operandos}
+Pueden ser {\tt LITERALES} o {\tt VARIABLES}:\\
+\subsubsection{Operadores, Precedencia de las operaciones}
+Pueden ser {\tt Aritméticos}, {\tt Lógicos} o {\tt de cadena de texto}:\\
+\paragraph{Operadores Aritméticos:} Ellos son suma, resta, multiplicación y
+división:\\
+\\{\tt + (SUM)}\\
+{\tt - (RES)}\\
+{\tt * (MUL)}\\
+{\tt / (DIV)}
+\paragraph{Operadores Lógicos:} Tenemos tres operadores lógicos:\\
+\\{\tt \& (Y)}\\
+{\tt | (O)}\\
+{\tt ! (NEG)}\\
+\paragraph{Operadores de relación:} Tenemos cuatro operadores de relación:\\
+\\{\tt > (MAYOR)}\\
+{\tt < (MENOR)}\\
+{\tt == (IGUAL)}\\
+\paragraph{Operadores de cadena de texto:} Solo hay un operador de cadenas y es
+para concatenación:\\
+\\{\tt . (CONCATENAR)}\\
+
+La precedencia de las operaciones es la siguiente (de mayor a menor):
+\begin{verbatim}
+
+                    asociatividad
+ -(UNARIO) !
+ * /            izquierda a derecha
+ + -            izquierda a derecha
+ < >            izquierda a derecha
+ ==             izquierda a derecha
+ & |            izquierda a derecha
+ =              derecha a izquierda
+ \end{verbatim}
+Los paréntesis pueden modificar estas reglas.
+\subsection{Comandos}
+\paragraph{Secuenciación}
+\begin{verbatim}
+   comm; comm;
+\end{verbatim}
+\paragraph{Condicional}
+\begin{verbatim}
+    IF boolexpr THEN comm ELSE comm ENDIF
+\end{verbatim}
+\paragraph{Bucle}
+\begin{verbatim}
+    WHILE boolexpr SINCE comm UNTIL
+\end{verbatim}
+\paragraph{sentencia vacía}
+\begin{verbatim}
+    SKIP
+\end{verbatim}
+\subsection{Funciones Built-in}
+Un concepto importante en nuestro {\tt DSL} es el de {\tt cursor}, que indica
+en qué lugar del texto nos encontramos ubicados. El {\tt cursor} es un par de
+números enteros {\tt (LINE, COLUMN)} que actúa como coordenada indicando
+número de línea (numeradas desde la línea 1 de arriba hacia abajo) y número
+de columna (numeradas desde 1 de izquierda a derecha) en que se halla el
+cursor; denominamos a esta: {\it línea actual}.
+El {\tt DSL} provee algunas funciones ({\it built-in}), que hacen uso de estos
+conceptos, ellas son:\\
+{\tt CLINE()} devuelve un INTEGER que indica el número de línea actual del
+archivo de entrada.\\
+{\tt LLINE()} devuelve un INTEGER que indica el número de la última línea del
+archivo de entrada.\\
+{\tt CURSOR(LINE, COL)} acepta dos parámetros INTEGER que indican número de
+línea y número de columna, su acción es colocar el cursor en la posición
+{\tt (LINE, COL)}.\\
+{\tt SUBSTRING(SRC, LINE)} Si la string SRC se encuentra en la línea número LINE
+devuelve el INTEGER 1, de lo contrario devuelve el INTEGER -1.\\
+{\tt REPLACE (SRC, DST)} reemplaza todas las ocurrencias de la cadena SRC por
+la cadena DST en la linea actual, si SRC no existe en la línea actual, no
+hace nada y tampoco falla dando error.\\
+{\tt ADD(SRC)} agrega SRC en la posición del cursor hacia la derecha\\
+{\tt LEN(SRC)} devuelve un INTEGER representando la longitud de la cadena SRC\\
+
+\subsection{Sintaxis Concreta}
+
+\begin{verbatim}
+    var     ::= letter | letter var
+
+    intexp  ::= nat
+            |   var
+            |   intexp '+' intexp
+            |   intexp '-' intexp
+            |   intexp '*' intexp
+            |   intexp '/' intexp
+            |   '(' intexp ')'
+
+    boolexp ::= 'TRUE' | 'FALSE'
+            |   intexp '==' intexp
+            |   intexp '<' intexp
+            |   intexp '>' intexp
+            |   boolexp '&' boolexpr
+            |   boolexp '|' boolexpr
+            |   '!' boolexpr
+            |   '(' boolexpr ')'
+
+    strexp  ::= '"' letter '"' | letter strexp
+            |   strexp '.' strexp
+
+    comm    ::= 'SKIP'
+            |   var '=' intexp | strexp
+            |   comm ';' comm
+            |   'IF' boolexp 'THEN' comm 'ELSE' comm 'END'
+            |   'WHILE' boolexpr 'SINCE' comm 'UNTIL'
+\end{verbatim}
+
+\subsection{Semántica Operacional Big-Step para Expresiones}
+
+\begin{equation}
+    {\over \langle \it nv, \sigma \rangle \Downarrow _{intexp }\it nv }
+    \textrm{ NV\scriptsize{AL}}
+\end{equation}
+\\
+\begin{equation}
+    {\over \langle \it nv, \sigma \rangle \Downarrow _{intexp }\it nv
+    }
+    \textrm{ V\scriptsize{AR}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e, \sigma \rangle \Downarrow _{intexp }\it n \over \langle
+    \it -_ue, \sigma \rangle \Downarrow _{intexp }\it -n
+    }
+    \textrm{ UM\scriptsize{INUS}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
+    \it e_0 + e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 + n_1
+    }
+    \textrm{ P\scriptsize{LUS}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
+    \it e_0 -_b e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 -_b n_1
+    }
+    \textrm{ BM\scriptsize{INUS}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
+    \it e_0 \times e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 \times n_1
+    }
+    \textrm{ T\scriptsize{IMES}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \quad n_1 \ne 0 \over \langle
+    \it e_0 \div e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 \div n_1
+    }
+    \textrm{ D\scriptsize{IV}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
+    \it e_0 = e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 = n_1
+    }
+    \textrm{ E\scriptsize{Q}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
+    \it e_0 < e_1, \sigma \rangle \Downarrow _{boolexp} \it n_0 < n_1
+    }
+    \textrm{ L\scriptsize{G}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
+    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
+    \it e_0 > e_1, \sigma \rangle \Downarrow _{boolexp }\it n_0 > n_1
+    }
+    \textrm{ G\scriptsize{T}}
+\end{equation}
+\\
+\begin{equation}
+    {\over \langle \it nv, \sigma \rangle \Downarrow _{boolexp }\it nv }
+    \textrm{ BV\scriptsize{AL}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it p, \sigma \rangle \Downarrow _{boolexp }\it n \over \langle
+    \it \neg e, \sigma \rangle \Downarrow _{boolexp }\it \neg n
+    }
+    \textrm{ N\scriptsize{OT}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it p_0, \sigma \rangle \Downarrow _{boolexp}\it n_0 \quad \langle \it
+    p_1, \sigma \rangle \Downarrow _{boolintexp }\it b_1 \over \langle
+    \it p_0 \lor p_1, \sigma \rangle \Downarrow _{boolintexp }\it b_0 \lor b_1
+    }
+    \textrm{ O\scriptsize{R}}
+\end{equation}
+\\
+\begin{equation}
+    { \langle \it p_0, \sigma \rangle \Downarrow _{boolexp}\it n_0 \quad \langle \it
+    p_1, \sigma \rangle \Downarrow _{boolintexp }\it b_1 \over \langle
+    \it b_0 \land b_1, \sigma \rangle \Downarrow _{boolintexp }\it b_0 \land b_1
+    }
+    \textrm{ A\scriptsize{ND}}
+\end{equation}
+\\
+\subsection{Semántica Operacional Estructural para Comandos}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
