@@ -3,7 +3,7 @@ module AST where
 -- Identificadores de Variable
 type Variable = String
 
--- Expresiones Aritmeticas
+-- Expresiones de Cadenas de caracteres
 data StrExp = Lit String
             | Var Variable
             | Concat StrExp StrExp
@@ -11,5 +11,6 @@ data StrExp = Lit String
 
 -- Comandos (sentencias)
 -- Observar que solo se permiten variables de un tipo (entero)
-data Comm = Let StrExp StrExp
+data Comm = Let Variable StrExp
+          | Seq Comm Comm
  deriving (Show,Eq)
