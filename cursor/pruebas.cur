@@ -1,0 +1,7 @@
+cadena := ("hola" ++ "que tal!") ++ ("como te" ++ "va!");
+//otraCadena := "tambien" ++ 5;
+otra := 5 + 5;
+//otramas := 5 ++ " cuantas veces!!!";
+// Siiiiiii := otra ++ cadena
+condicion1 := true | false;
+condicion2 := false & true

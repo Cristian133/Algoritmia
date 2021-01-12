@@ -1,7 +1,7 @@
 module Main where
 
 import System.Environment (getArgs)
-import Parser2 (parseComm)
+import Parser (parseComm)
 
 -- Modificar este import para usar diferentes evaluadores
 -- import Eval1
