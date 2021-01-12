@@ -7,11 +7,17 @@ type Variable = String
 data StrExp = Lit String
             | Var Variable
             | Concat StrExp StrExp
+            | CurrentLineStr
+            | LastLineStr
  deriving (Show,Eq)
 
 -- Expresiones Aritmeticas
 data IntExp = Const Integer
-            | Name Variable
+            | Name Variable             --   _
+            | CurrentLineInt            --  |
+            | CurrentColInt             -- <| funciones built-in de consulta
+            | LastLineInt               --  |
+            | SubString StrExp StrExp   --  |_
             | UMinus IntExp
             | Plus IntExp IntExp
             | Minus IntExp IntExp
@@ -32,9 +38,14 @@ data BoolExp = BTrue
  deriving (Show,Eq)
 
 -- Comandos (sentencias)
--- Observar que solo se permiten variables de un tipo (entero)
-data Comm = Let Variable StrExp
-          | Set Variable IntExp
+data Comm = Skip
+          | Set Variable StrExp
+          | Iet Variable IntExp
           | Bet Variable BoolExp
           | Seq Comm Comm
+          | Cond BoolExp Comm Comm
+          | Repeat Comm BoolExp
+          | Cursor IntExp IntExp     -- funciones built-in de acción
+          | Reemplazar StrExp StrExp
+          | SaltarLinea IntExp
  deriving (Show,Eq)
