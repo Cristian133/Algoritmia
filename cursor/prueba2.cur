@@ -1,19 +1,27 @@
 // Declaraciones
 
 // variables enteras
-a := 1;
-b := 2;
+a = 1;
+b = 2;
 
 // variables cadena
-c := ("hola" ++ "que") ++ "tal!";
-d := "hola" ++ ("que" ++ "tal!");
+c = ("hola" ++ "que") ++ "tal!";
+d = "hola" ++ ("que" ++ "tal!");
 
 // variables booleanas
-e := true;
-f := false;
+e = true;
+f = false;
 
 // comandos
 if  a < b
     then skip
-    else var := true
-    end
+    else var = true
+end;
+
+repeat
+    a = a + 1;
+    c1 = "Hola" ++ ("que" ++ "tal!");
+    c2 = ("Hola" ++ "que") ++ "tal!"
+until
+    a < 10
+end
