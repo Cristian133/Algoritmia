@@ -141,15 +141,15 @@ comm2 = try (do reserved cursor "skip"
                     reserved cursor "end"
                     return (Repeat c cond))
         <|> try (do s1 <- identifier cursor
-                    reservedOp cursor ":="
+                    reservedOp cursor "="
                     s2 <- strexp
                     return (Set s1 s2))
         <|> try (do s <- identifier cursor
-                    reservedOp cursor ":="
+                    reservedOp cursor "="
                     e <- intexp
                     return (Iet s e))
         <|> try (do s <- identifier cursor
-                    reservedOp cursor ":="
+                    reservedOp cursor "="
                     e <- boolexp
                     return (Bet s e))
 
@@ -174,15 +174,15 @@ built = try (do reserved cursor "skip"
                     reserved cursor "end"
                     return (Repeat c cond))
         <|> try (do s1 <- identifier cursor
-                    reservedOp cursor ":="
+                    reservedOp cursor "="
                     s2 <- strexp
                     return (Set s1 s2))
         <|> try (do s <- identifier cursor
-                    reservedOp cursor ":="
+                    reservedOp cursor "="
                     e <- intexp
                     return (Iet s e))
         <|> try (do s <- identifier cursor
-                    reservedOp cursor ":="
+                    reservedOp cursor "="
                     e <- boolexp
                     return (Bet s e))
 
