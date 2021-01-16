@@ -1,9 +1,60 @@
-cadena = ("hola" ++ "que tal!") ++ ("como te" ++ "va!");
-//otraCadena = "tambien" ++ 5;
+cadena = ("hola " ++ "que tal, ") ++ ("como te" ++ " va ");
+skip;
 otra = 5 + 5;
-//otramas = 5 ++ " cuantas veces!!!";
-// Siiiiiii = otra ++ cadena
-condicion1 = true | false;
-condicion2 = false & true;
-bool1 = true;
-bool2 = (2 < 1) & false
+bool2 = (2 < 1) & false;
+
+if
+    false
+then 
+    a = 0
+else
+    a=1
+end;
+
+if
+    true
+then 
+    b = false & true;
+    j = (1<2)
+else
+    a=1
+end;
+
+a = cline;
+b = lline;
+
+repeat
+    j = cline;
+    f = col;
+    i = substr "Hoal" "ChaChau";
+    u = cur 2 3; 
+    c1 = "Hola" ++ ("que" ++ "tal");
+    c2 = ("Hola" ++ "que") ++ "tal"
+until
+    true
+end;
+
+skip
+/*
+
+    RESULTADO
+
+let cadena = hola que tal!, como te va!
+let otra = 10
+let bool2 = False
+if
+    False
+then
+else
+    let a = 1
+endif
+
+if
+    True
+then
+    let b = False
+    let j = True
+else
+    let a = 1
+endif
+*/

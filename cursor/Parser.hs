@@ -26,7 +26,7 @@ cursor = makeTokenParser ( emptyDef   { commentStart  = "/*"
                                                          "line", "col",                 -- int
                                                          "cantlines", "substr",         -- int
                                                          "cline", "lline",              -- str
-                                                         "poscursor", "rplz", "jline"   -- void
+                                                         "cur", "rplz", "jline"   -- void
                                                         ]})
 
 --------------------------------------------------
@@ -39,12 +39,24 @@ strexp  = chainl1 strexp2 (try (do reservedOp cursor "++"
 strexp2 = try (parens cursor strexp)
           <|> try (do lit <- stringLiteral cursor
                       return (Lit lit))
---          <|>  try (do num <- integer cursor
---                       return (Lit (show num)))
           <|> do str <- reserved cursor "cline"
-                 return CurrentLineStr
+                 return CurrentLineInt
           <|> do str <- reserved cursor "lline"
                  return LastLineStr
+          <|> try (do reserved cursor "line"
+                      return CurrentLineInt)
+          <|> try (do reserved cursor "col"
+                      return CurrentColInt)
+          <|> try (do reserved cursor "cantlines"
+                      return LastLineInt)
+          <|> try (do  reserved cursor "substr"
+                       str1 <- stringLiteral cursor
+                       str2 <- stringLiteral cursor
+                       return (SubString (Lit str1) (Lit str2)))
+          <|> try (do  reserved cursor "cur"
+                       i1 <- integer cursor
+                       i2 <- integer cursor
+                       return (Cursor (Const i1) (Const i2)))
 ----------------------------------
 --- Parser de expressiones enteras
 -----------------------------------
@@ -60,18 +72,7 @@ factor = try (parens cursor intexp)
          <|> (do n <- integer cursor
                  return (Const n)
               <|> do str <- identifier cursor
-                     return (Name str)
-                     <|> try (do reserved cursor "line"
-                                 return CurrentLineInt)
-                     <|> try (do reserved cursor "col"
-                                 return CurrentColInt)
-                     <|> try (do reserved cursor "cantlines"
-                                 return LastLineInt)
-                     <|> try (do  reserved cursor "substr"
-                                  str1 <- stringLiteral cursor
-                                  -- sepBy " "
-                                  str2 <- stringLiteral cursor
-                                  return (SubString (Lit str1) (Lit str2))))
+                     return (Var str))
 
 multopp = do try (reservedOp cursor "*")
              return Times
@@ -125,39 +126,6 @@ comm = chainl1 comm2 (try (do reservedOp cursor ";"
                               return Seq))
 
 comm2 = try (do reserved cursor "skip"
-                return Skip)
-        <|> try (do reserved cursor "if"
-                    cond <- boolexp
-                    reserved cursor "then"
-                    case1 <- comm
-                    reserved cursor "else"
-                    case2 <- comm
-                    reserved cursor "end"
-                    return (Cond cond case1 case2))
-        <|> try (do reserved cursor "repeat"
-                    c <- comm
-                    reserved cursor "until"
-                    cond <- boolexp
-                    reserved cursor "end"
-                    return (Repeat c cond))
-        <|> try (do s1 <- identifier cursor
-                    reservedOp cursor "="
-                    s2 <- strexp
-                    return (Set s1 s2))
-        <|> try (do s <- identifier cursor
-                    reservedOp cursor "="
-                    e <- intexp
-                    return (Iet s e))
-        <|> try (do s <- identifier cursor
-                    reservedOp cursor "="
-                    e <- boolexp
-                    return (Bet s e))
-
------------------------------------
---- Parser de funciones built-in
------------------------------------
-built :: Parser Comm
-built = try (do reserved cursor "skip"
                 return Skip)
         <|> try (do reserved cursor "if"
                     cond <- boolexp

@@ -1,97 +1,102 @@
 module Eval (eval) where
 
+import Data.List
+
 import AST
 
--- Estados
-type State = [(Variable,Integer)]
-type StateStr = [(Variable,String)]
+ -- Remove punctuation from text String.
+removeInutilChar :: String -> String
+removeInutilChar xs = [x | x <- xs, not (x `elem` "\"\\")]
 
--- Estado nulo
-initState :: State
-initState = []
-initStateStr :: StateStr
-initStateStr = []
-
--- Busca el valor de una variabl en un estado
-lookfor :: Variable -> State -> Integer
-lookfor var ((x,y):xs)= if var == x then y
-                                    else lookfor var xs
-lookforStr :: Variable -> StateStr -> String
-lookforStr varS ((x,y):xs)= if varS == x then y
-                                    else lookforStr varS xs
-
--- Cambia el valor de una variable en un estado
-update :: Variable -> Integer -> State -> State
-update var valor [] = [(var,valor)]
-update var valor ((x,y):xs) = if var == x then (var,valor):xs
-                                          else (x,y): update var valor xs
-updateStr :: Variable -> String -> StateStr -> StateStr
-updateStr varS valorS [] = [(varS,valorS)]
-updateStr varS valorS ((x,y):xs) = if varS == x then (varS,valorS):xs
-                                          else (x,y): updateStr varS valorS xs
--- Evalua un programa en el estado nulo
-eval :: Comm -> State
-eval p = evalComm p initState
-
--- Evalua un comando en un estado dado
+-- Evalua un comando
 -- Completar definicion
-evalComm :: Comm -> State -> State
-evalComm Skip e = e
-evalComm (Iet var expInt) estado = let valor = evalIntExp expInt estado
-                                       in update var valor estado
-evalComm (Seq Skip c1) s = evalComm c1 s
-evalComm (Seq c1 c2) s = let s' = evalComm c1 s
-                                  in evalComm (Seq Skip c2) s'
--- Evalua una expresion entera
-evalIntExp :: IntExp -> State -> Integer
-evalIntExp (Const valor) estado = valor
-evalIntExp (Name variable) estado = lookfor variable estado
-evalIntExp (UMinus expInt) estado = let valor = evalIntExp expInt estado
-                                    in (-valor)
-evalIntExp (Plus exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                         valor2 = evalIntExp exp2 estado
-                                         in valor1 + valor2
+eval :: Comm -> String
 
-evalIntExp (Minus exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                          valor2 = evalIntExp exp2 estado
-                                          in valor1 - valor2
-evalIntExp (Times exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                          valor2 = evalIntExp exp2 estado
-                                          in valor1 * valor2
-evalIntExp (Div exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                        valor2 = evalIntExp exp2 estado
-                                        in div valor1 valor2
+eval (Iet var expInt)   = let v = show (evalIntExp expInt)
+                          in "let " ++ var ++ " = " ++ v ++ " "
+eval (Set var expStr)   = let v = evalStrExp expStr
+                          in "let " ++ var ++ " = " ++ v ++ " "
+eval (Bet var expBool)  = let v = show (evalBoolExp expBool)
+                          in "let " ++ var ++ " = " ++ v ++ " "
 
--- Evalua una expresion cadena
-evalStrExp :: StrExp -> StateStr -> String
-evalStrExp (Lit valorS) estadoStr = valorS
-evalStrExp (Var variable) estadoStr = lookforStr variable estadoStr
-evalStrExp (Concat exp1 exp2) estadoStr = let valor1 = evalStrExp exp1 estadoStr
-                                              valor2 = evalStrExp exp2 estadoStr
-                                          in valor1 ++ valor2
+eval Skip = []
+eval (Seq Skip c)       = eval c
+eval (Seq c1 c2)        = let s1 = show (eval (Seq Skip c1))
+                              s2 = show (eval (Seq Skip c2))
+                          in  removeInutilChar s1 ++ removeInutilChar s2
+
+eval (Cond b c1 c2)     = let b' = show (evalBoolExp b)
+                              s1 =  show (eval c1)
+                              s2 =  show (eval c2)
+                          in "if " ++ b' ++ " " ++ s1 ++ " else " ++ s2 ++ " endif "
+
+eval (Repeat c b)       = let b' = show (evalBoolExp b)
+                              s  = show (eval c)
+                          in "while " ++ b' ++ " " ++ s ++ " endwhile "
 
 -- Evalua una expresion entera
 -- Completar definicion
-evalBoolExp :: BoolExp -> State -> Bool
-evalBoolExp BTrue estado = True
-evalBoolExp BFalse estado = False
-evalBoolExp (Eq exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                        valor2 = evalIntExp exp2 estado
-                                        in valor1 == valor2
+evalIntExp :: IntExp -> Integer
+evalIntExp (Const valor)        = valor
+evalIntExp (UMinus expInt)      = let valor = evalIntExp expInt
+                                  in (-valor)
+evalIntExp (Plus exp1 exp2)     = let valor1 = evalIntExp exp1
+                                      valor2 = evalIntExp exp2
+                                  in valor1 + valor2
 
-evalBoolExp (Lt exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                        valor2 = evalIntExp exp2 estado
-                                        in valor1 < valor2
+evalIntExp (Minus exp1 exp2)    = let valor1 = evalIntExp exp1
+                                      valor2 = evalIntExp exp2
+                                  in valor1 - valor2
+evalIntExp (Times exp1 exp2)    = let valor1 = evalIntExp exp1
+                                      valor2 = evalIntExp exp2
+                                  in valor1 * valor2
+evalIntExp (Div exp1 exp2)      = let valor1 = evalIntExp exp1
+                                      valor2 = evalIntExp exp2
+                                  in div valor1 valor2
 
-evalBoolExp (Gt exp1 exp2) estado = let valor1 = evalIntExp exp1 estado
-                                        valor2 = evalIntExp exp2 estado
-                                        in valor1 > valor2
+-- Evalua una expresion de cadena
+-- Completar definicion
+evalStrExp :: StrExp -> String
+evalStrExp (Lit valor) = valor
+evalStrExp (Concat exp1 exp2) = let valor1 = evalStrExp exp1
+                                    valor2 = evalStrExp exp2
+                                in valor1 ++ valor2
 
-evalBoolExp (And exp1 exp2) estado = let valor1 = evalBoolExp exp1 estado
-                                         valor2 = evalBoolExp exp2 estado
-                                        in valor1 && valor2
+-- built-in function
+evalStrExp CurrentLineStr       = "call getline('.')"
+evalStrExp CurrentLineInt       = "call line('.')"
+evalStrExp LastLineStr          = "call getline('$')"
+evalStrExp LastLineInt          = "call line('$')"
+evalStrExp CurrentColInt        = "call col('.')"
+evalStrExp (Cursor exp1 exp2)   = let s1 = show (evalIntExp exp1)
+                                      s2 = show (evalIntExp exp1)  
+                                  in "call cursor(" ++ s1 ++ "," ++ s2 ++ ")"
+evalStrExp (SubString exp1 exp2)   = let s1 = evalStrExp exp1
+                                         s2 = evalStrExp exp2  
+                                     in "call istridx(" ++ s1 ++ ", " ++ s2 ++ ")"
 
-evalBoolExp (Or exp1 exp2) estado = let valor1 = evalBoolExp exp1 estado
-                                        valor2 = evalBoolExp exp2 estado
-                                        in valor1 || valor2
-evalBoolExp (Not exp1) estado = not (evalBoolExp exp1 estado)
+-- Evalua una expresion booleana
+-- Completar definicion
+evalBoolExp :: BoolExp -> Bool
+evalBoolExp BTrue = True
+evalBoolExp BFalse = False
+evalBoolExp (Eq exp1 exp2)  = let valor1 = evalIntExp exp1
+                                  valor2 = evalIntExp exp2
+                              in valor1 == valor2
+
+evalBoolExp (Lt exp1 exp2)  = let valor1 = evalIntExp exp1
+                                  valor2 = evalIntExp exp2
+                              in valor1 < valor2
+
+evalBoolExp (Gt exp1 exp2)  = let valor1 = evalIntExp exp1
+                                  valor2 = evalIntExp exp2
+                              in valor1 > valor2
+
+evalBoolExp (And exp1 exp2) = let valor1 = evalBoolExp exp1
+                                  valor2 = evalBoolExp exp2
+                              in valor1 && valor2
+
+evalBoolExp (Or exp1 exp2)  = let valor1 = evalBoolExp exp1
+                                  valor2 = evalBoolExp exp2
+                              in valor1 || valor2
+evalBoolExp (Not exp1)      = not (evalBoolExp exp1)

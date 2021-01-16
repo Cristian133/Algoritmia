@@ -24,4 +24,8 @@ repeat
     c2 = ("Hola" ++ "que") ++ "tal!"
 until
     a < 10
-end
+end;
+
+count = cantlines; 
+cadena =  cline ++ lline ++ "Muy bien!";
+cond = substr "hola" "chau!"

@@ -5,25 +5,27 @@ type Variable = String
 
 -- Expresiones de Cadenas de caracteres
 data StrExp = Lit String
-            | Var Variable
+            | Name Variable
             | Concat StrExp StrExp
             | CurrentLineStr
+            | CurrentLineInt
             | LastLineStr
+            | LastLineInt
+            | CurrentColInt
+            | Cursor IntExp IntExp
+            | SubString StrExp StrExp
+            | AvanzarLinea IntExp
+            | Reemplazar StrExp StrExp
  deriving (Show,Eq)
 
 -- Expresiones Aritmeticas
 data IntExp = Const Integer
-            | Name Variable             --   _
-            | CurrentLineInt            --  |
-            | CurrentColInt             -- <| funciones built-in de consulta
-            | LastLineInt               --  |
-            | SubString StrExp StrExp   --  |_
+            | Var Variable
             | UMinus IntExp
             | Plus IntExp IntExp
             | Minus IntExp IntExp
             | Times IntExp IntExp
             | Div IntExp IntExp
---          | Question BoolExp IntExp IntExp -- a > 0 ? 1 : 2;
  deriving (Show,Eq)
 
 -- Expresiones Booleanas
@@ -45,7 +47,4 @@ data Comm = Skip
           | Seq Comm Comm
           | Cond BoolExp Comm Comm
           | Repeat Comm BoolExp
-          | Cursor IntExp IntExp     -- funciones built-in de acción
-          | Reemplazar StrExp StrExp
-          | SaltarLinea IntExp
  deriving (Show,Eq)
