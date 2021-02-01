@@ -20,13 +20,13 @@ cursor = makeTokenParser ( emptyDef   { commentStart  = "/*"
                                       , commentEnd    = "*/"
                                       , commentLine   = "//"
                                       , opLetter      = char '='
-                                      , reservedNames = ["true","false","skip","if",
-                                                         "then","else","end",
-                                                         "while","do", "repeat",
+                                      , reservedNames = ["true","false","skip",
+                                                         "if","then","else","endif",
+                                                         "while","since","endwhile",
                                                          "line", "col",                 -- int
                                                          "cantlines", "substr",         -- int
                                                          "cline", "lline",              -- str
-                                                         "cur", "rplz", "jline"   -- void
+                                                         "cur", "rplz", "jline"         -- void
                                                         ]})
 
 --------------------------------------------------
@@ -38,7 +38,7 @@ strexp  = chainl1 strexp2 (try (do reservedOp cursor "++"
                                    return Concat))
 strexp2 = try (parens cursor strexp)
           <|> try (do lit <- stringLiteral cursor
-                      return (Lit lit))
+                      return (Literal lit))
           <|> do str <- reserved cursor "cline"
                  return CurrentLineInt
           <|> do str <- reserved cursor "lline"
@@ -52,7 +52,7 @@ strexp2 = try (parens cursor strexp)
           <|> try (do  reserved cursor "substr"
                        str1 <- stringLiteral cursor
                        str2 <- stringLiteral cursor
-                       return (SubString (Lit str1) (Lit str2)))
+                       return (SubString (Literal str1) (Literal str2)))
           <|> try (do  reserved cursor "cur"
                        i1 <- integer cursor
                        i2 <- integer cursor
@@ -133,13 +133,13 @@ comm2 = try (do reserved cursor "skip"
                     case1 <- comm
                     reserved cursor "else"
                     case2 <- comm
-                    reserved cursor "end"
+                    reserved cursor "endif"
                     return (Cond cond case1 case2))
-        <|> try (do reserved cursor "repeat"
-                    c <- comm
-                    reserved cursor "until"
+        <|> try (do reserved cursor "while"
                     cond <- boolexp
-                    reserved cursor "end"
+                    reserved cursor "since"
+                    c <- comm
+                    reserved cursor "endwhile"
                     return (Repeat c cond))
         <|> try (do s1 <- identifier cursor
                     reservedOp cursor "="

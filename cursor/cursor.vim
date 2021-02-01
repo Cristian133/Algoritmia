@@ -23,8 +23,8 @@ endif
 
 " A bunch of useful C keywords
 syn keyword	cStatement	    skip
-syn keyword	cConditional	if then else end
-syn keyword	cRepeat		    repeat until end
+syn keyword	cConditional	if then else endif
+syn keyword	cRepeat		    while since until endwhile
 
 syn keyword	cTodo		contained TODO FIXME XXX
 

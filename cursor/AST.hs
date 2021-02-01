@@ -4,7 +4,7 @@ module AST where
 type Variable = String
 
 -- Expresiones de Cadenas de caracteres
-data StrExp = Lit String
+data StrExp = Literal String
             | Name Variable
             | Concat StrExp StrExp
             | CurrentLineStr

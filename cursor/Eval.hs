@@ -57,7 +57,7 @@ evalIntExp (Div exp1 exp2)      = let valor1 = evalIntExp exp1
 -- Evalua una expresion de cadena
 -- Completar definicion
 evalStrExp :: StrExp -> String
-evalStrExp (Lit valor) = valor
+evalStrExp (Literal valor) = valor
 evalStrExp (Concat exp1 exp2) = let valor1 = evalStrExp exp1
                                     valor2 = evalStrExp exp2
                                 in valor1 ++ valor2
@@ -69,10 +69,10 @@ evalStrExp LastLineStr          = "call getline('$')"
 evalStrExp LastLineInt          = "call line('$')"
 evalStrExp CurrentColInt        = "call col('.')"
 evalStrExp (Cursor exp1 exp2)   = let s1 = show (evalIntExp exp1)
-                                      s2 = show (evalIntExp exp1)  
+                                      s2 = show (evalIntExp exp1)
                                   in "call cursor(" ++ s1 ++ "," ++ s2 ++ ")"
 evalStrExp (SubString exp1 exp2)   = let s1 = evalStrExp exp1
-                                         s2 = evalStrExp exp2  
+                                         s2 = evalStrExp exp2
                                      in "call istridx(" ++ s1 ++ ", " ++ s2 ++ ")"
 
 -- Evalua una expresion booleana

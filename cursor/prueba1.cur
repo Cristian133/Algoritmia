@@ -9,7 +9,7 @@ then
     a = 0
 else
     a=1
-end;
+endif;
 
 if
     true
@@ -18,21 +18,20 @@ then
     j = (1<2)
 else
     a=1
-end;
+endif;
 
 a = cline;
 b = lline;
 
-repeat
+while true
+    since
     j = cline;
     f = col;
     i = substr "Hoal" "ChaChau";
     u = cur 2 3; 
     c1 = "Hola" ++ ("que" ++ "tal");
     c2 = ("Hola" ++ "que") ++ "tal"
-until
-    true
-end;
+endwhile;
 
 skip
 /*
