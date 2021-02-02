@@ -3,7 +3,8 @@ module Main where
 import System.Environment (getArgs)
 import Parser (parseComm)
 
--- Modificar este import para usar diferentes evaluadores
+-- Modificar este import para usar diferentes evaluadores/transpiladores
+import Transp
 import Eval
 ---------------------------------------------------------
 
@@ -18,5 +19,6 @@ run ifile =
     s <- readFile ifile
     case parseComm ifile s of
       Left error -> print error
-      Right t    -> print (eval t) --imprimir el resultado de evaluar.
-     -- Right t    -> print t        --imprimir sin evaluar (para testear Parser)
+      Right t    -> print (transp t) --imprimir el resultado de transpilar.
+     -- Right t    -> print (eval t) --imprimir el resultado de evaluar.
+     -- Right t    -> print t        --imprimir sin evaluar/transpilar (para testear Parser)
