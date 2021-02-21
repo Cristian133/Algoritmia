@@ -1,0 +1,7 @@
+El indentado es solo coma a los efectos de hacer mas legible el programa por
+parte de las personas. Este ______hola______ programa recorre desde la primera hasta la
+última lı́nea del texto, cuando encuentra la cadena ______"hola"_____ la reemplaza
+por ______hola______ y agrega un punto y coma al final de la lı́nea hola. El compilador
+nos dará la siguiente salida en un archivo: command.vim _____hola_____ hoy es martes
+Aquí dice _____hola_____ también coma
+coma punto y coma

@@ -1,5 +1,0 @@
-l = line;
-c = col;
-count = cantlines; // ++ "nop";
-cadena =  cline ++ lline ++ "Muy bien!";
-cond = substr "hola" "chau!"

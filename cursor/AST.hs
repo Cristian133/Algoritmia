@@ -5,32 +5,30 @@ type Variable = String
 
 -- Expresiones de Cadenas de caracteres
 data StrExp = Literal String
-            | Name Variable
+            | VarStr Variable
             | Concat StrExp StrExp
             | CurrentLineStr
-            | CurrentLineInt
             | LastLineStr
-            | LastLineInt
-            | CurrentColInt
-            | Cursor IntExp IntExp
-            | SubString StrExp StrExp
-            | AvanzarLinea IntExp
-            | Reemplazar StrExp StrExp
  deriving (Show,Eq)
 
--- Expresiones Aritmeticas
+-- Expresiones Aritméticas
 data IntExp = Const Integer
-            | Var Variable
+            | VarInt Variable
             | UMinus IntExp
             | Plus IntExp IntExp
             | Minus IntExp IntExp
             | Times IntExp IntExp
             | Div IntExp IntExp
+            | CurrentLineInt
+            | CurrentColInt
+            | LastLineInt
+            | SubString StrExp
  deriving (Show,Eq)
 
 -- Expresiones Booleanas
 data BoolExp = BTrue
              | BFalse
+             | VarBool Variable
              | Eq IntExp IntExp
              | Lt IntExp IntExp
              | Gt IntExp IntExp
@@ -47,4 +45,10 @@ data Comm = Skip
           | Seq Comm Comm
           | Cond BoolExp Comm Comm
           | Repeat Comm BoolExp
+          | AvanzarLinea
+          | RetroLinea
+          | Origen
+          | Reemplazar StrExp StrExp
+          | ExCommand StrExp
+          | Echo StrExp
  deriving (Show,Eq)

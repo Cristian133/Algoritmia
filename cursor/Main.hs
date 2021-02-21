@@ -5,7 +5,6 @@ import Parser (parseComm)
 
 -- Modificar este import para usar diferentes evaluadores/transpiladores
 import Transp
-import Eval
 ---------------------------------------------------------
 
 main :: IO ()
@@ -19,6 +18,6 @@ run ifile =
     s <- readFile ifile
     case parseComm ifile s of
       Left error -> print error
-      Right t    -> print (transp t) --imprimir el resultado de transpilar.
-     -- Right t    -> print (eval t) --imprimir el resultado de evaluar.
-     -- Right t    -> print t        --imprimir sin evaluar/transpilar (para testear Parser)
+      Right t      -> writeFile "command.vim" (transp t)    --imprimir el resultado en archivo.
+     -- Right t    -> print (transp t)                      --imprimir el resultado en pantalla.
+     -- Right t    -> print t                               --imprimir el aŕbol en pantalla.

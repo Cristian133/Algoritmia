@@ -1,0 +1,55 @@
+// Asignaciones
+
+// enteras
+a = 1 + 2;
+b = 2 + 3 * a;
+c = 1 + a;
+d = 5 + curLine;
+d = 1005 + totLines;
+
+// string
+x = "hola ";
+y = " chau";
+u = x ++ y;
+z = "Lunes y " ++ "Martes";
+w = ("hola " ++ "que ") ++ "tal!";
+q = "hola " ++ ("que " ++ "tal!");
+
+// commandos
+while
+    curLine < totLines
+since
+    fLine;
+    if 
+        (subStr "hola") > -1
+    then
+        echo "si";
+        sust hola CHAU
+    else
+        echo "no"
+    endif
+endwhile;
+
+rLine;
+origen;
+
+while
+    curLine < totLines
+since
+    fLine;
+    if 
+        (subStr "coma") > -1
+    then
+        sust coma COMA
+    else
+        skip
+    endif
+endwhile;
+
+// excom "echo = \"buen día\"";
+
+echo q;
+
+// vemos termina OK en línea de comandos
+// si llega al final sin errores
+echo "termina OK"

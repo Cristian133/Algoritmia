@@ -20,13 +20,12 @@ cursor = makeTokenParser ( emptyDef   { commentStart  = "/*"
                                       , commentEnd    = "*/"
                                       , commentLine   = "//"
                                       , opLetter      = char '='
-                                      , reservedNames = ["true","false","skip",
+                                      , reservedNames = ["true","false","skip", "echo",
                                                          "if","then","else","endif",
                                                          "while","since","endwhile",
-                                                         "line", "col",                 -- int
-                                                         "cantlines", "substr",         -- int
-                                                         "cline", "lline",              -- str
-                                                         "cur", "rplz", "jline"         -- void
+                                                         "curLine", "curCol", "totLines", "subStr", -- exp int
+                                                         "getCurrentLine", "getLastLine",           -- exp str
+                                                         "fLine", "rLine", "sust", "excom", "origen"
                                                         ]})
 
 --------------------------------------------------
@@ -39,24 +38,13 @@ strexp  = chainl1 strexp2 (try (do reservedOp cursor "++"
 strexp2 = try (parens cursor strexp)
           <|> try (do lit <- stringLiteral cursor
                       return (Literal lit))
-          <|> do str <- reserved cursor "cline"
-                 return CurrentLineInt
-          <|> do str <- reserved cursor "lline"
+          <|> do str <- identifier cursor
+                 return (VarStr str)
+          <|> do str <- reserved cursor "getCurrentLine"
+                 return CurrentLineStr
+          <|> do str <- reserved cursor "getLastLine"
                  return LastLineStr
-          <|> try (do reserved cursor "line"
-                      return CurrentLineInt)
-          <|> try (do reserved cursor "col"
-                      return CurrentColInt)
-          <|> try (do reserved cursor "cantlines"
-                      return LastLineInt)
-          <|> try (do  reserved cursor "substr"
-                       str1 <- stringLiteral cursor
-                       str2 <- stringLiteral cursor
-                       return (SubString (Literal str1) (Literal str2)))
-          <|> try (do  reserved cursor "cur"
-                       i1 <- integer cursor
-                       i2 <- integer cursor
-                       return (Cursor (Const i1) (Const i2)))
+
 ----------------------------------
 --- Parser de expressiones enteras
 -----------------------------------
@@ -72,7 +60,16 @@ factor = try (parens cursor intexp)
          <|> (do n <- integer cursor
                  return (Const n)
               <|> do str <- identifier cursor
-                     return (Var str))
+                     return (VarInt str)
+              <|> do reserved cursor "curLine"
+                     return CurrentLineInt
+              <|> do reserved cursor "curCol"
+                     return CurrentColInt
+              <|> do reserved cursor "totLines"
+                     return LastLineInt
+              <|> do reserved cursor "subStr"
+                     str <- stringLiteral cursor
+                     return (SubString (Literal str)))
 
 multopp = do try (reservedOp cursor "*")
              return Times
@@ -117,7 +114,8 @@ boolvalue = try (do reserved cursor "true"
                     return BTrue)
             <|> try (do reserved cursor "false"
                         return BFalse)
-
+            <|> try (do str <- identifier cursor
+                        return (VarBool str))
 -----------------------------------
 --- Parser de comandos
 -----------------------------------
@@ -153,6 +151,22 @@ comm2 = try (do reserved cursor "skip"
                     reservedOp cursor "="
                     e <- boolexp
                     return (Bet s e))
+        <|> try (do reserved cursor "echo"
+                    s <- strexp
+                    return (Echo s))
+        <|> try (do reserved cursor "fLine"
+                    return AvanzarLinea)
+        <|> try (do reserved cursor "rLine"
+                    return RetroLinea)
+        <|> try (do reserved cursor "origen"
+                    return Origen)
+        <|> try (do reserved cursor "sust"
+                    s1 <- strexp
+                    s2 <- strexp
+                    return (Reemplazar s1 s2))
+        <|> try (do reserved cursor "excom"
+                    s <- strexp
+                    return (ExCommand s))
 
 ------------------------------------
 -- Funcion de parseo
