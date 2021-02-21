@@ -14,7 +14,8 @@ since
         // imprime "si1" en linea de comandos de vim
         // mayormente para depuración
         echo "si1";
-        sust hola HOLA
+        sust hola HOLA;
+        finalStr ___cambió_HOLA___
     else
         // imprime "no1" en linea de comandos de vim
         echo "no1"
@@ -37,7 +38,8 @@ since
         (subStr "coma") > -1
     then
         sust coma COMA;
-        echo "si2"
+        echo "si2";
+        finalStr ___cambió_COMA___
     else
         echo "no2";
         skip
@@ -62,7 +64,8 @@ since
         (subStr "auto") > -1
     then
         sust auto AUTO;
-        echo "si3"
+        echo "si3";
+        finalStr ___cambió_AUTO___
     else
         skip;
         echo "no3"
@@ -86,7 +89,8 @@ since
         // imprime "si1" en linea de comandos de vim
         // mayormente para depuración
         echo "si4";
-        sust lunes LUNES
+        sust lunes LUNES;
+        finalStr ___cambió_LUNES___
     else
         // imprime "no1" en linea de comandos de vim
         echo "no4"
@@ -97,6 +101,10 @@ endwhile;
 // acedemos a cualquier commando de vim directamente
 // excom "let x = 1005";
 
+// borramos linea 25
+delLine 25;
+
+// asignamos algunas strings
 x = "hola";
 y = " que tal!";
 u = x ++ y;

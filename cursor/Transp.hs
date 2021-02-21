@@ -7,37 +7,46 @@ import AST
 -- comandos
 transp :: Comm -> String
 transp Skip = []
-transp (Seq Skip c)       = transp c
-transp (Iet var expInt)   = let v = transpIntExp expInt
-                            in "let " ++ var ++ " = " ++ v
-transp (Set var expStr)   = let v = transpStrExp expStr
-                            in "let " ++ var ++ " = " ++ v
-transp (Bet var expBool)  = let v = transpBoolExp expBool
-                            in "let " ++ var ++ " = " ++ v
-transp (Seq c1 c2)        = let s1 = transp (Seq Skip c1)
-                                s2 = transp (Seq Skip c2)
-                            in  s1 ++ "\n" ++ s2
-transp (Cond b c1 c2)     = let b' = transpBoolExp b
-                                s1 = transp c1
-                                s2 = transp c2
-                            in "if " ++ b' ++  "\n" ++ s1 ++  "\n" ++ "else" ++  "\n" ++ s2 ++  "\n" ++ "endif"
+transp (Seq Skip c)             = transp c
+transp (Iet var expInt)         = let v = transpIntExp expInt
+                                  in "let " ++ var ++ " = " ++ v
+transp (Set var expStr)         = let v = transpStrExp expStr
+                                  in "let " ++ var ++ " = " ++ v
+transp (Bet var expBool)        = let v = transpBoolExp expBool
+                                  in "let " ++ var ++ " = " ++ v
+transp (Seq c1 c2)              = let s1 = transp (Seq Skip c1)
+                                      s2 = transp (Seq Skip c2)
+                                  in  s1 ++ "\n" ++ s2
+transp (Cond b c1 c2)           = let b' = transpBoolExp b
+                                      s1 = transp c1
+                                      s2 = transp c2
+                                  in "if " ++ b' ++  "\n" ++ s1 ++  "\n" ++ "else" ++  "\n" ++ s2 ++  "\n" ++ "endif"
 
-transp (Repeat c b)       = let b' = transpBoolExp b
-                                c' = transp c
-                            in "while " ++ b' ++  "\n" ++ c' ++  "\n" ++ "endwhile"
-transp (Echo s)           = let s' = transpStrExp s
-                            in "echom " ++ s'
-transp AvanzarLinea       = "call cursor( line('.') + 1, 1)"
-transp RetroLinea         = "call cursor( line('.') - 1, 1)"
-transp Origen             = "call cursor( 1, 1)"
-transp (GoToLine expInt)  = let e = transpIntExp expInt
-                            in "call cursor(" ++ e ++", 1)"
-transp Final              = "call cursor( line('$'), 1)"
-transp (Reemplazar s1 s2) = let s1' = transpStrExp s1
-                                s2' = transpStrExp s2
-                            in "execute \"s/" ++ s1' ++ "/" ++ s2'++ "/g\""
-transp (ExCommand s)      = let s' = transpStrExp s
-                            in s'
+transp (Repeat c b)             = let b' = transpBoolExp b
+                                      c' = transp c
+                                  in "while " ++ b' ++  "\n" ++ c' ++  "\n" ++ "endwhile"
+transp (Echo s)                 = let s' = transpStrExp s
+                                  in "echom " ++ s'
+transp AvanzarLinea             = "call cursor( line('.') + 1, 1)"
+transp RetroLinea               = "call cursor( line('.') - 1, 1)"
+transp Origen                   = "call cursor( 1, 1)"
+transp (GoToLine expInt)        = let e = transpIntExp expInt
+                                  in "call cursor(" ++ e ++", 1)"
+transp (DelLine expInt)         = let e = transpIntExp expInt
+                                  in "call cursor(" ++ e ++", 1)\nexecute \"normal! dd\""
+transp DelCurLine               = "execute \"normal! dd\""
+transp Final                    = "call cursor( line('$'), 1)"
+transp (Reemplazar s1 s2)       = let s1' = transpStrExp s1
+                                      s2' = transpStrExp s2
+                                  in "execute \"s/" ++ s1' ++ "/" ++ s2'++ "/g\""
+transp (AddStrCurPosition s)    = let s' = transpStrExp s
+                                  in "execute \"normal! i" ++ s' ++ "<ESC>\""
+transp (AddStrBeginLine s)      = let s' = transpStrExp s
+                                  in "execute \"normal! I" ++ s' ++ "<ESC>\""
+transp (AddStrFinalLine s)      = let s' = transpStrExp s
+                                  in "execute \"normal! A" ++ s' ++ "\\<ESC>\""
+transp (ExCommand s)            = let s' = transpStrExp s
+                                  in s'
 
 -- expresiones enteras
 transpIntExp :: IntExp -> String
@@ -70,8 +79,8 @@ transpStrExp (VarStr valor)       = valor
 transpStrExp (Concat exp1 exp2)   = let valor1 = transpStrExp exp1
                                         valor2 = transpStrExp exp2
                                     in  valor1 ++ " . " ++  valor2
-transpStrExp CurrentLineStr         = "getline('.')"
-transpStrExp LastLineStr            = "getline('$')"
+transpStrExp CurrentLineStr       = "getline('.')"
+transpStrExp LastLineStr          = "getline('$')"
 
 -- expresiones booleanas
 transpBoolExp :: BoolExp -> String

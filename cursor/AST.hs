@@ -49,8 +49,13 @@ data Comm = Skip
           | RetroLinea
           | Origen
           | GoToLine IntExp
+          | DelLine IntExp
+          | DelCurLine
           | Final
           | Reemplazar StrExp StrExp
+          | AddStrCurPosition StrExp
+          | AddStrBeginLine  StrExp
+          | AddStrFinalLine  StrExp
           | ExCommand StrExp
           | Echo StrExp
  deriving (Show,Eq)

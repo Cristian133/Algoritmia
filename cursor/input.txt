@@ -17,4 +17,10 @@
 7 Aquí dice _hola_ también _coma_, _auto_ y podría ser _hola_
 8 _coma_ punto y _coma_ y por supuesto _auto_
 9 de aquí en adelante _hola_ los domingos _coma_ los _lunes_ y _auto_ los viernes
-
+0
+1
+2
+3
+4
+5 Esta línea no debe estar después de la ejecución
+6

@@ -26,7 +26,8 @@ cursor = makeTokenParser ( emptyDef   { commentStart  = "/*"
                                                          "curLine", "curCol", "totLines", "subStr", -- exp int
                                                          "getCurrentLine", "getLastLine",           -- exp str
                                                          "fLine", "rLine", "sust", "excom",
-                                                         "origen", "goToLine", "final"
+                                                         "origen", "goToLine", "delLine", "delCurLine", "final",
+                                                         "addStr", "beginStr", "finalStr"
                                                         ]})
 
 --------------------------------------------------
@@ -164,12 +165,26 @@ comm2 = try (do reserved cursor "skip"
         <|> try (do reserved cursor "goToLine"
                     e <- intexp
                     return (GoToLine e))
+        <|> try (do reserved cursor "delLine"
+                    e <- intexp
+                    return (DelLine e))
+        <|> try (do reserved cursor "delCurLine"
+                    return DelCurLine)
         <|> try (do reserved cursor "final"
                     return Final)
         <|> try (do reserved cursor "sust"
                     s1 <- strexp
                     s2 <- strexp
                     return (Reemplazar s1 s2))
+        <|> try (do reserved cursor "addStr"
+                    s <- strexp
+                    return (AddStrCurPosition s))
+        <|> try (do reserved cursor "beginStr"
+                    s <- strexp
+                    return (AddStrBeginLine s))
+        <|> try (do reserved cursor "finalStr"
+                    s <- strexp
+                    return (AddStrFinalLine s))
         <|> try (do reserved cursor "excom"
                     s <- strexp
                     return (ExCommand s))
