@@ -30,6 +30,9 @@ transp (Echo s)           = let s' = transpStrExp s
 transp AvanzarLinea       = "call cursor( line('.') + 1, 1)"
 transp RetroLinea         = "call cursor( line('.') - 1, 1)"
 transp Origen             = "call cursor( 1, 1)"
+transp (GoToLine expInt)  = let e = transpIntExp expInt
+                            in "call cursor(" ++ e ++", 1)"
+transp Final              = "call cursor( line('$'), 1)"
 transp (Reemplazar s1 s2) = let s1' = transpStrExp s1
                                 s2' = transpStrExp s2
                             in "execute \"s/" ++ s1' ++ "/" ++ s2'++ "/g\""

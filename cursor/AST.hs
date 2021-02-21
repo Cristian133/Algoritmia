@@ -48,6 +48,8 @@ data Comm = Skip
           | AvanzarLinea
           | RetroLinea
           | Origen
+          | GoToLine IntExp
+          | Final
           | Reemplazar StrExp StrExp
           | ExCommand StrExp
           | Echo StrExp

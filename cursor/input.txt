@@ -1,7 +1,20 @@
-El indentado es solo coma a los efectos de hacer mas legible el programa por
-parte de las personas. Este ______hola______ programa recorre desde la primera hasta la
-última lı́nea del texto, cuando encuentra la cadena ______"hola"_____ la reemplaza
-por ______hola______ y agrega un punto y coma al final de la lı́nea hola. El compilador
-nos dará la siguiente salida en un archivo: command.vim _____hola_____ hoy es martes
-Aquí dice _____hola_____ también coma
-coma punto y coma
+1 El indentado es solo _coma_ a los efectos de hacer mas legible el programa por
+2 _auto_ despues del mediodía podría llover y me voy a pescar en _auto_, _hola_
+3 parte de las personas. Este _hola_ programa recorre desde la primera hasta la
+4 última lı́nea del texto, cuando encuentra _lunes_ la cadena _"hola"_ la reemplaza
+5 _auto_ por _hola_ y agrega un punto y _coma_ al final de la lı́nea _hola_. El compilador
+6 nos dará la _auto_ siguiente salida en un archivo: command.vim _hola_ hoy es martes
+7 Aquí dice _hola_ también _coma_, _auto_ y podría ser _hola_
+8 _coma_ punto y _coma_ y por supuesto _auto_
+9 de aquí en adelante _hola_ los domingos _coma_ los lunes y _auto los viernes
+0
+1 El indentado es solo _coma_ a los efectos de hacer mas legible el programa por
+2 _auto_ despues del mediodía podría llover y me voy a pescar en _auto_, _hola_
+3 parte de las personas. Este _hola_ programa recorre desde la primera hasta la
+4 última lı́nea del texto, cuando encuentra la cadena _"hola"_ la reemplaza
+5 _auto_ por _hola_ y agrega un punto y _coma_ al final de la lı́nea _hola_. El compilador
+6 nos dará la _auto_ siguiente salida _lunes_ en un archivo: command.vim _hola_ hoy es martes
+7 Aquí dice _hola_ también _coma_, _auto_ y podría ser _hola_
+8 _coma_ punto y _coma_ y por supuesto _auto_
+9 de aquí en adelante _hola_ los domingos _coma_ los _lunes_ y _auto_ los viernes
+

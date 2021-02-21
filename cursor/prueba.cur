@@ -1,55 +1,113 @@
-// Asignaciones
+// nos paramos al comienzo del archivo
+origen;
 
-// enteras
-a = 1 + 2;
-b = 2 + 3 * a;
-c = 1 + a;
-d = 5 + curLine;
-d = 1005 + totLines;
-
-// string
-x = "hola ";
-y = " chau";
-u = x ++ y;
-z = "Lunes y " ++ "Martes";
-w = ("hola " ++ "que ") ++ "tal!";
-q = "hola " ++ ("que " ++ "tal!");
-
-// commandos
+// recorremos el archivo línea a línea desde la 1 hasta la última
+// en cada línea preguntamos si contiene la substring "hola"
+// si es true (distinto de -1 en este caso) se sustituye
+// la string "hola" por la string "CHAU"
 while
     curLine < totLines
 since
-    fLine;
     if 
         (subStr "hola") > -1
     then
-        echo "si";
-        sust hola CHAU
+        // imprime "si1" en linea de comandos de vim
+        // mayormente para depuración
+        echo "si1";
+        sust hola HOLA
     else
-        echo "no"
-    endif
+        // imprime "no1" en linea de comandos de vim
+        echo "no1"
+    endif;
+    fLine
 endwhile;
 
-rLine;
+// volver cursor a la primera línea, primera columna
 origen;
 
+// recorremos el archivo línea a línea desde la 1 hasta la 10
+// en cada línea preguntamos si contiene la substring "coma"
+// si es true (distinto de -1 en este caso) se sustituye
+// la string "coma" por la string "COMA"
+a = 10;
 while
-    curLine < totLines
+    curLine < 10
 since
-    fLine;
     if 
         (subStr "coma") > -1
     then
-        sust coma COMA
+        sust coma COMA;
+        echo "si2"
     else
+        echo "no2";
         skip
-    endif
+    endif;
+    fLine
 endwhile;
 
-// excom "echo = \"buen día\"";
+// vamos a última línea
+final;
 
+// recorremos el archivo línea a línea desde la última hasta la 10
+// sin incluir, desde abajo hacia arriba,
+// en cada línea preguntamos si contiene la substring "auto"
+// si es true (distinto de -1 en este caso) se sustituye
+// la string "hola" por la string "AUTO"
+b = 9;
+c = 1 + b;
+while
+    curLine > c
+since
+    if 
+        (subStr "auto") > -1
+    then
+        sust auto AUTO;
+        echo "si3"
+    else
+        skip;
+        echo "no3"
+    endif;
+    rLine
+endwhile;
+
+// nos paramos en linea 15
+goToLine 15;
+
+// recorremos el archivo línea a línea desde la 15 hasta la última
+// en cada línea preguntamos si contiene la substring "lunes"
+// si es true (distinto de -1 en este caso) se sustituye
+// la string "lunes" por la string "LUNES"
+while
+    curLine < totLines
+since
+    if 
+        (subStr "lunes") > -1
+    then
+        // imprime "si1" en linea de comandos de vim
+        // mayormente para depuración
+        echo "si4";
+        sust lunes LUNES
+    else
+        // imprime "no1" en linea de comandos de vim
+        echo "no4"
+    endif;
+    fLine
+endwhile;
+
+// acedemos a cualquier commando de vim directamente
+// excom "let x = 1005";
+
+x = "hola";
+y = " que tal!";
+u = x ++ y;
+w = ("hola " ++ "que ") ++ "tal!";
+q = "hola " ++ ("que " ++ "tal!");
+
+// muestra en linea de commandos el valor de la variables definidas más arriba
+echo u;
+echo w;
 echo q;
 
-// vemos termina OK en línea de comandos
-// si llega al final sin errores
+// vemos la strnig termina OK en línea de comandos
+// si el programa llega al final llega al final
 echo "termina OK"
