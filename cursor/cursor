@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# cursor file
+cursor_file=$1
+
+# input file/ output file
+io_file=$2
+
+. ./Main $cursor_file
+
+vim -n -N -u NONE -S command.vim $io_file

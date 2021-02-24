@@ -21,3 +21,4 @@ run ifile =
       Right t      -> writeFile "command.vim" (transp t)    --imprimir el resultado en archivo.
      -- Right t    -> print (transp t)                      --imprimir el resultado en pantalla.
      -- Right t    -> print t                               --imprimir el aŕbol en pantalla.
+
