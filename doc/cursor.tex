@@ -3,20 +3,22 @@
 \usepackage[latin1]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
-\title{Sintaxis del DSL CURSOR}
-\author{Cristian Andrione\\
+\title{Lenguaje de Dominio Específico CURSOR}
+\author{Cristan Andrione\\
   \small Programación Profesional\\
   \small Analista Universitario en Sistemas\\
   \small Instituo Politécnico "General San Martín"\\
   \small Universidad Nacional de Rosario
+  \small Profesor: Juan Manuel Rabasedas
 }
 
 \begin{document}
 
 \maketitle
 
-\abstract{ Se propone un {\tt DSL}, para realizar procesamiento de texto,
+\abstract{ Se presenta un {\tt DSL}, para realizar procesamiento de texto,
 al que bautizamos con el nombre {\tt Cursor}. Aprovecharemos, para este
 cometido, la potencia del editor de texto {\tt Vim}, en particular de su lenguaje
 de srcipting {\tt Vimscript},
@@ -38,36 +40,200 @@ que será traducida a {\tt Vimscript} para ejecutarse sobre el
 texto a tratar.
 
 \section{DSL}
-Un ejemplo de la sintaxis:
+Se presenta un lenguaje imperativo simple con variables y comandos para asignación,
+composición secuencial, ejecución condicional ({\tt if}) y ciclos ({\tt while})
+\\ Un ejemplo de la sintaxis:
 \\
 \begin{verbatim}
-WHILE lineaActual() < totalLineas()
-     SINCE
-        IF
-            SUBSTRING("hola", lineaActual())
-        THEN
-            REEMPLAZAR ("hola", "chau!");
-            AGREGAR(";", finLinea());
-        ELSE
-            SKIP;
-        ENDIF
-        avanzarLinea(1);
-     UNTIL
+
+    // nos paramos al comienzo del archivo
+    origen;
+
+    // recorremos el archivo línea a línea desde la 1 hasta la última
+    // en cada línea preguntamos si contiene la substring "hola"
+    // si es true (distinto de -1 en este caso) se sustituye
+    // la string "hola" por la string "CHAU"
+    while
+    curLine < totLines
+    since
+    if
+        (subStr "hola") > -1
+    then
+        // imprime "si1" en linea de comandos de vim
+        // mayormente para depuración
+        echo "si1";
+        sust hola HOLA;
+        finalStr ___cambió_HOLA___
+    else
+        // imprime "no1" en linea de comandos de vim
+        echo "no1"
+    endif;
+    fLine
+    endwhile;
+
+    // volver cursor a la primera línea, primera columna
+    origen;
+
+    // recorremos el archivo línea a línea desde la 1 hasta la 10
+    // en cada línea preguntamos si contiene la substring "coma"
+    // si es true (distinto de -1 en este caso) se sustituye
+    // la string "coma" por la string "COMA"
+    a = 10;
+    while
+    curLine < 10
+    since
+    if
+        (subStr "coma") > -1
+    then
+        sust coma COMA;
+        echo "si2";
+        finalStr ___cambió_COMA___
+    else
+        echo "no2";
+        skip
+    endif;
+    fLine
+    endwhile;
+
+    // vamos a última línea
+    final;
+
+    // recorremos el archivo línea a línea desde la última hasta la 10
+    // sin incluir, desde abajo hacia arriba,
+    // en cada línea preguntamos si contiene la substring "auto"
+    // si es true (distinto de -1 en este caso) se sustituye
+    // la string "hola" por la string "AUTO"
+    b = 9;
+    c = 1 + b;
+    while
+    curLine > c
+    since
+    if
+        (subStr "auto") > -1
+    then
+        sust auto AUTO;
+        echo "si3";
+        finalStr ___cambió_AUTO___
+    else
+        skip;
+        echo "no3"
+    endif;
+    rLine
+    endwhile;
+
+    // nos paramos en linea 15
+    goToLine 15;
+
+    // recorremos el archivo línea a línea desde la 15 hasta la última
+    // en cada línea preguntamos si contiene la substring "lunes"
+    // si es true (distinto de -1 en este caso) se sustituye
+    // la string "lunes" por la string "LUNES"
+    while
+    curLine < totLines
+    since
+    if
+        (subStr "lunes") > -1
+    then
+        // imprime "si1" en linea de comandos de vim
+        // mayormente para depuración
+        echo "si4";
+        sust lunes LUNES;
+        finalStr ___cambió_LUNES___
+    else
+        // imprime "no1" en linea de comandos de vim
+        echo "no4"
+    endif;
+    fLine
+    endwhile;
+
+    // acedemos a cualquier commando de vim directamente
+    // excom "let x = 1005";
+
+    // borramos linea 25
+    delLine 25;
+
+    // asignamos algunas strings
+    x = "hola";
+    y = " que tal!";
+    u = x ++ y;
+    w = ("hola " ++ "que ") ++ "tal!";
+    q = "hola " ++ ("que " ++ "tal!");
+
+    // muestra en linea de commandos el valor de la variables definidas más arriba
+    echo u;
+    echo w;
+    echo q;
+
+    // vemos la strnig termina OK en línea de comandos
+    // si el programa llega al final llega al final
+    echo "termina OK"
 \end{verbatim}
 \indent El indentado es solo a los efectos de hacer mas legible el programa por
 parte de las personas.
-Este programa recorre desde la primera hasta la última línea del texto,
-cuando encuentra la cadena {\tt 'hola'} la reemplaza por {\tt 'chau'} y agrega
-un punto y coma al final de la línea.
-El compilador nos dará la siguiente salida en un archivo: command.vim
+Los comentarios indican lo que va haciendo el programa.
+El compilador nos dará la siguiente salida en un archivo: {\tt command.vim}
 \begin{verbatim}
-while line('.') < line('$')
-    call cursor( line('.')+1, 1)
-    if stridx(getline('.'), 'hola') > -1
-        execute "%s/'hola'/'chau'"
-        execute "normal! A;\<ESC>"
+
+    call cursor( 1, 1)
+    while line('.') < line('$')
+    if stridx(getline('.'), 'hola') >  -1
+    echom 'si1'
+    execute "s/hola/HOLA/g"
+    execute "normal! A___cambió_HOLA___\<ESC>"
+    else
+    echom 'no1'
     endif
-endwhile
+    call cursor( line('.') + 1, 1)
+    endwhile
+    call cursor( 1, 1)
+    let a = 10
+    while line('.') < 10
+    if stridx(getline('.'), 'coma') >  -1
+    execute "s/coma/COMA/g"
+    echom 'si2'
+    execute "normal! A___cambió_COMA___\<ESC>"
+    else
+    echom 'no2'
+
+    endif
+    call cursor( line('.') + 1, 1)
+    endwhile
+    call cursor( line('$'), 1)
+    let b = 9
+    let c = 1 + b
+    while line('.') > c
+    if stridx(getline('.'), 'auto') >  -1
+    execute "s/auto/AUTO/g"
+    echom 'si3'
+    execute "normal! A___cambió_AUTO___\<ESC>"
+    else
+    echom 'no3'
+    endif
+    call cursor( line('.') - 1, 1)
+    endwhile
+    call cursor(15, 1)
+    while line('.') < line('$')
+    if stridx(getline('.'), 'lunes') >  -1
+    echom 'si4'
+    execute "s/lunes/LUNES/g"
+    execute "normal! A___cambió_LUNES___\<ESC>"
+    else
+    echom 'no4'
+    endif
+    call cursor( line('.') + 1, 1)
+    endwhile
+    call cursor(25, 1)
+    execute "normal! dd"
+    let x = 'hola'
+    let y = ' que tal!'
+    let u = x . y
+    let w = 'hola ' . 'que ' . 'tal!'
+    let q = 'hola ' . 'que ' . 'tal!'
+    echom u
+    echom w
+    echom q
+    echom 'termina OK'
+
 \end{verbatim}
 Por último se ejecuta la secuencia de operaciones:
 \begin{verbatim}
@@ -75,14 +241,6 @@ vim -n -N -u NONE -S comand.vim achivo_a_procesar.txt
 \end{verbatim}
 La salida es el mismo archivo. El archivo no necesariamente debe estar
 escrito con {\tt Vim}.
-
-%\subsection{Directivas}
-
-%Tenemos cuatro directivas:\\
-%{\tt FILEIN} path del archivo a procesar.\\
-%{\tt FILEOUT} path del archivo de salida, puede ser el mismo.\\
-%{\tt BEGINPROG} comienzo del programa.\\
-%{\tt ENDPROG} fin del programa.\\
 
 \subsection{Variables, Tipos y Asiganciones}
 La variables podrán tener los tipos {\tt INTEGER}, {\tt STRING} o {\tt
@@ -133,21 +291,33 @@ La precedencia de las operaciones es la siguiente (de mayor a menor):
  \end{verbatim}
 Los paréntesis pueden modificar estas reglas.
 \subsection{Comandos}
-\paragraph{Secuenciación}
+\paragraph{Secuenciación: }
+Los commandos deben separarse mediante punto y coma, pero el último de la lista
+no lleva signo de puntuación.
 \begin{verbatim}
-   comm; comm;
+   comm; comm
 \end{verbatim}
 \paragraph{Condicional}
 \begin{verbatim}
-    IF boolexpr THEN comm ELSE comm ENDIF
+    if
+        boolexpr
+    then
+        comm
+    else
+        comm
+    endif
 \end{verbatim}
 \paragraph{Bucle}
 \begin{verbatim}
-    WHILE boolexpr SINCE comm UNTIL
+    while
+        boolexpr
+    since
+        comm
+    until
 \end{verbatim}
 \paragraph{sentencia vacía}
 \begin{verbatim}
-    SKIP
+    skip
 \end{verbatim}
 \subsection{Funciones Built-in}
 Un concepto importante en nuestro {\tt DSL} es el de {\tt cursor}, que indica
@@ -158,23 +328,143 @@ de columna (numeradas desde 1 de izquierda a derecha) en que se halla el
 cursor; denominamos a esta: {\it línea actual}.
 El {\tt DSL} provee algunas funciones ({\it built-in}), que hacen uso de estos
 conceptos, ellas son:\\
-{\tt CLINE()} devuelve un INTEGER que indica el número de línea actual del
-archivo de entrada.\\
-{\tt LLINE()} devuelve un INTEGER que indica el número de la última línea del
-archivo de entrada.\\
-{\tt CURSOR(LINE, COL)} acepta dos parámetros INTEGER que indican número de
-línea y número de columna, su acción es colocar el cursor en la posición
-{\tt (LINE, COL)}.\\
-{\tt SUBSTRING(SRC, LINE)} Si la string SRC se encuentra en la línea número LINE
-devuelve el INTEGER 1, de lo contrario devuelve el INTEGER -1.\\
-{\tt REPLACE (SRC, DST)} reemplaza todas las ocurrencias de la cadena SRC por
-la cadena DST en la linea actual, si SRC no existe en la línea actual, no
-hace nada y tampoco falla dando error.\\
-{\tt ADD(SRC)} agrega SRC en la posición del cursor hacia la derecha\\
-{\tt LEN(SRC)} devuelve un INTEGER representando la longitud de la cadena SRC\\
 
+{\tt curLine} devuelve un INTEGER que indica el número de línea actual
+archivo de entrada.\\
+
+{\tt curCol} devuelve un INTEGER que indica el número de columna de la línea
+actual.\\
+
+{\tt totLine} devuelve un INTEGER que indica el número de la última línea, es
+decir el número total de líneas del archivo de entrada.\\
+
+{\tt substring(src, line)} Si la string {\tt src} se encuentra en la línea número
+{\tt line} devuelve un INTEGER distinto de -1, de lo contrario devuelve el INTEGER -1.\\
+
+{\tt getCurrentLine} devuelve una {\tt string} que se corresponde con la  {\tt línea actual}.\\
+
+{\tt getLastLine} devuelve una {\tt sting} que se corresponde con la última
+línea del archivo.\\
+
+{\tt fLine} avanza una línea el cursor.\\
+
+{\tt rLine} retrocede una línea el cursor.\\
+
+{\tt sust (src, dst)} reemplaza todas las ocurrencias de la cadena {\tt src} por
+la cadena {\tt dst} en la linea actual, si S{\tt src} no existe en la línea actual, no
+hace nada.\\
+
+{\tt origen} envía el cursor a la posición (1,1).\\
+
+{\tt final} envía el cursor a la posición (1, totLinea).\\
+
+{\tt gotoLine intExp} envía el cursor a la línea {\tt intExp}.\\
+
+{\tt delLine intExp} borrar la línea {\tt intExp}.\\
+
+{\tt delCurLine intExp} borrar la línea actual.\\
+
+{\tt addStr strtExp} agrega la string {\tt strExp} la posición actual del cursor.\\
+
+{\tt beginStr strExp} agrega la string {\tt strExp} al comienzo de la línea actual.\\
+
+{\tt finalStr strExp} agrega la string {\tt strExp} al final de la línea actual.\\
+
+\section{Instalación (Linux)}
+Para la instalación descargamos los fuentes del repositorio {\it GitHub}
+\url{https://github.com/Cristian133/algoritmia} ya sea comprimido
+en formato zip desde la web o podemos clonarlo directamente en nuestro
+directorio de trabajo con el siguiente commando:
+\begin{verbatim}
+$ git clone https://github.com/Cristian133/algoritmia
+\end{verbatim}
+Si no tenemos git instalado (en distribuciones derivadas de {\tt Debian}):
+\begin{verbatim}
+$ sudo apt install git
+\end{verbatim}
+Luego debemos ingresar al directorio {\tt cursor} dentro de la carpeta {\tt
+algoritmia}:
+\begin{verbatim}
+$ cd algoritmia/cursor
+\end{verbatim}
+En esta carpeta nos encontramos los siguientes archivos:
+\begin{itemize}
+    \item Los archivos principales escritos en haskell: {\tt Main.hs}, {\tt
+        AST.hs}, {\tt Parser.hs}, {\tt Transp.hs}.
+    \item El archivo de resaltado de sintaxis: {\tt cursor.vim}.
+    \item El archivo {\tt input.txt} contiene el texto a procesar, a su vez será archivo de salida, ya que en él se graba el resultado global del proceso.
+    \item El archivo {\tt command.vim} es el script generado por nuestro DSL y
+        que tomará vim para procesar el texto dado en {\tt input.txt}. (Este archivo podría no estar ya que se genera durante la ejecución)
+    \item El archivo {\tt cursor} es un script bash que ejecutará el archivo
+        resultado de la compilación con dos argumentos: el archivo extensión
+        {\tt .cur} con el programa y el archivo de  entrada {\tt input.txt}. Éste nos da el resultado final.
+    \item Un archivo {\tt makefile} que se encarga de la compilación y limpieza posterior.
+\end{itemize}
+
+Ejecutar en consola el comando:
+\begin{verbatim}
+$ make
+\end{verbatim}
+Si todo está bien nos dará la siguiente salida:
+\begin{verbatim}
+    > ghc -o Main Main.hs
+    > [1 of 4] Compiling AST              ( AST.hs, AST.o )
+    > [2 of 4] Compiling Parser           ( Parser.hs, Parser.o )
+    > [3 of 4] Compiling Transp           ( Transp.hs, Transp.o )
+    > [4 of 4] Compiling Main             ( Main.hs, Main.o )
+    > Linking Main ...
+\end{verbatim}
+Indicando que la compilación fue exitosa!!!.
+\\ Opcional: Limpiar los archivos innecesarios (producto de la compilación {\tt .o
+.hi}); para ello:
+\begin{verbatim}
+$ make clean
+\end{verbatim}
+Ejecutar el DSL propiamente dicho:
+\begin{verbatim}
+$ . ./cursor prueba.cur input.txt
+\end{verbatim}
+(Los símbolos {\tt . ./} antes del nombre del archivo son necesarios porque nuestra carpeta de trabajo no está en el PATH).
+Esto nos abre el vim con el texto cambiado según las instrucciones del programa.
+
+\section{Desarrollo del trabajo y decisiones de diseño}
+Durante las clases de la materia trabajamos sobre un lenguaje imperativo simple
+llamado {\tt LIS}. Mi idea para desarrollar el lenguage {\tt cursor} fue basarme en el
+lenguaje anterior. No hubo mayor inconveniente para escribir el {\tt AST}. Los problemas comenzaron con el {\tt parser} ya que las librerías
+{\tt haskell} que usamos, {\tt parsec}, no son sencillas Aquí tuve que
+parar con la escritura de código y estudiar con detalle esta librería, para
+luego retomar (2 semanas después) la escritura del {\tt parser}. El parser
+funcionó bien, cada cosa estaba en su lugar en nuestro frondoso árbol. Creo que
+la decisión de diseño más importante la tomé en la intancia posterior: el
+temido {\tt evaluador}!. Yo intentaba, como lo hacía el lenguaje {\tt LIS},
+mantener el {\tt estado} de la variables del programa para ir resolviendo las
+expresiones a medida que dicho {\tt estado} cambiaba, pero el problema eran las
+funciones {\tt built-in}. Tomemos como ejemplo a la función {\tt curLine}; la
+cual nos devuelve un {INTEGER} que representa el número de la línea actual.
+Por lo tanto esta función debe poder formar parte de una expresión entera. por
+ejemplo:
+\begin{verbatim}
+var = (1 + 1) * 5 + curLine
+\end{verbatim}
+El problema es que el valor de {\tt curLine} no puede ser conocido en tiempo de
+compilación, ya que durante la misma no se conoce el archivo de entrada.
+Por lo tanto después de probar varias opciones (entre ellas una resolución parcial de
+expresiones que me deparó varías decepciones) decidí hacer una traducción y no
+resolver nada, sino que resuelva {\tt vim}.
+Entonces ya no se hizo necesario mantener un {\tt estado}. El trabajo ahora se
+trataba de construir un {AST}, para luego a partir de él construir expresiones
+en la sintaxis de {\tt vim}. Esta tarea la realiza el programa haskell {\tt
+Transp.hs}.
+\\Sabemos que haskell es un lenguaje interpretado y también puede compilarse. La
+idea fue que el usuario final no tenga que vérselas con el interprete {\tt ghci}
+sino que use directamente los ejecutables compilados, de una forma amigable.
+Entonces se realizó un archivo {\tt makefile} para automatizar la compilación
+de los fuentes y la limpieza de los archivo innecesarios y por último un
+archivo {\tt bash} que ejecuta todo lo necesario.
+\section{Análisis del Lenguage}
 \subsection{Sintaxis Concreta}
-
+La sintaxis concreta de un lenguaje incluye todas las caracter¿¿sticas que se observan en un progama fuente, como
+delimitadores y paréntesis.
 \begin{verbatim}
     var     ::= letter | letter var
 
@@ -184,9 +474,14 @@ hace nada y tampoco falla dando error.\\
             |   intexp '-' intexp
             |   intexp '*' intexp
             |   intexp '/' intexp
+            |   'curLine'
+            |   'curCol'
+            |   'totLines'
+            |   'subStr' strexp
             |   '(' intexp ')'
 
-    boolexp ::= 'TRUE' | 'FALSE'
+    boolexp ::= 'true' | 'false'
+                var
             |   intexp '==' intexp
             |   intexp '<' intexp
             |   intexp '>' intexp
@@ -195,120 +490,26 @@ hace nada y tampoco falla dando error.\\
             |   '!' boolexpr
             |   '(' boolexpr ')'
 
-    strexp  ::= '"' letter '"' | letter strexp
+    strexp  ::= '"' letter '"'
+            |   var
+            |   letter strexp
             |   strexp '.' strexp
+            |   'getCurrentLine'
+            |   'getLastLine'
 
-    comm    ::= 'SKIP'
-            |   var '=' intexp | strexp
+    comm    ::= 'skip'
+            |   var '=' intexp | strexp | boolExp
             |   comm ';' comm
-            |   'IF' boolexp 'THEN' comm 'ELSE' comm 'END'
-            |   'WHILE' boolexpr 'SINCE' comm 'UNTIL'
+            |   'if' boolexp 'then' comm 'else' comm 'endif'
+            |   'while' boolexpr 'since' comm 'endwhile'
+            |   'origen'
+            |   'goToLine
+            |   'delLine'
+            |   'delCurLine'
+            |   'final'
+            |   'addStr' strexp
+            |   'beginStr' strexp
+            |   'finalStr' strexp
+            |   'sust' strexp strexp
 \end{verbatim}
-
-\subsection{Semántica Operacional Big-Step para Expresiones}
-
-\begin{equation}
-    {\over \langle \it nv, \sigma \rangle \Downarrow _{intexp }\it nv }
-    \textrm{ NV\scriptsize{AL}}
-\end{equation}
-\\
-\begin{equation}
-    {\over \langle \it nv, \sigma \rangle \Downarrow _{intexp }\it nv
-    }
-    \textrm{ V\scriptsize{AR}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e, \sigma \rangle \Downarrow _{intexp }\it n \over \langle
-    \it -_ue, \sigma \rangle \Downarrow _{intexp }\it -n
-    }
-    \textrm{ UM\scriptsize{INUS}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
-    \it e_0 + e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 + n_1
-    }
-    \textrm{ P\scriptsize{LUS}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
-    \it e_0 -_b e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 -_b n_1
-    }
-    \textrm{ BM\scriptsize{INUS}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
-    \it e_0 \times e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 \times n_1
-    }
-    \textrm{ T\scriptsize{IMES}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \quad n_1 \ne 0 \over \langle
-    \it e_0 \div e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 \div n_1
-    }
-    \textrm{ D\scriptsize{IV}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
-    \it e_0 = e_1, \sigma \rangle \Downarrow _{intexp }\it n_0 = n_1
-    }
-    \textrm{ E\scriptsize{Q}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
-    \it e_0 < e_1, \sigma \rangle \Downarrow _{boolexp} \it n_0 < n_1
-    }
-    \textrm{ L\scriptsize{G}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it e_0, \sigma \rangle \Downarrow _{intexp }\it n_0 \quad \langle \it
-    e_1, \sigma \rangle \Downarrow _{intexp }\it n_1 \over \langle
-    \it e_0 > e_1, \sigma \rangle \Downarrow _{boolexp }\it n_0 > n_1
-    }
-    \textrm{ G\scriptsize{T}}
-\end{equation}
-\\
-\begin{equation}
-    {\over \langle \it nv, \sigma \rangle \Downarrow _{boolexp }\it nv }
-    \textrm{ BV\scriptsize{AL}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it p, \sigma \rangle \Downarrow _{boolexp }\it n \over \langle
-    \it \neg e, \sigma \rangle \Downarrow _{boolexp }\it \neg n
-    }
-    \textrm{ N\scriptsize{OT}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it p_0, \sigma \rangle \Downarrow _{boolexp}\it n_0 \quad \langle \it
-    p_1, \sigma \rangle \Downarrow _{boolintexp }\it b_1 \over \langle
-    \it p_0 \lor p_1, \sigma \rangle \Downarrow _{boolintexp }\it b_0 \lor b_1
-    }
-    \textrm{ O\scriptsize{R}}
-\end{equation}
-\\
-\begin{equation}
-    { \langle \it p_0, \sigma \rangle \Downarrow _{boolexp}\it n_0 \quad \langle \it
-    p_1, \sigma \rangle \Downarrow _{boolintexp }\it b_1 \over \langle
-    \it b_0 \land b_1, \sigma \rangle \Downarrow _{boolintexp }\it b_0 \land b_1
-    }
-    \textrm{ A\scriptsize{ND}}
-\end{equation}
-\\
-\subsection{Semántica Operacional Estructural para Comandos}
-
 \end{document}
