@@ -11,4 +11,4 @@ clean:
 	rm -f *.o *.hi
 
 cleanall:
-	rm -f *.o *.hi Main command.vim
+	rm -f *.o *.hi Main
